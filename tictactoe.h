@@ -17,7 +17,7 @@ class TicTacToe {
 public: 
   void startGame();  
   void nextTurn(); 
-  int  move(int); 
+  int  tryMove(int); 
 
   void checkForWin(); 
   void draw();
@@ -46,7 +46,26 @@ void TicTacToe::initBoard() {
   }
 }
 
-int TicTacToe::move(int i) {
+int TicTacToe::tryMove(int i) {
+  int row, col;
+  if(current_pos <= 3) {
+    row = 0;
+    col = current_pos - 1;
+  } else if (current_pos <= 6) {
+    row = 1;
+    col = current_pos - 4;
+  } else {
+    row = 2;
+    col = current_pos - 7;
+  }
+
+  if(board[row][col] == 0 || board[row][col] == 3) {
+    board[row][col] = turn;
+    current_pos = 1;
+  } else {
+    cout << "Invalid move." << endl;
+  }
+
   nextTurn();
 
   return i; 
@@ -120,7 +139,9 @@ void TicTacToe::potentialMove(int dir) {
     case 97:
         current_pos = ((current_pos - 1) % 3 == 0) ? current_pos + 2 : current_pos - 1;
         break;
-    
+    case 99:
+        tryMove(current_pos);
+        break;
   }
 
   mutateBoard(current_pos, 3);
