@@ -1,4 +1,5 @@
 #include <iostream> 
+#include <curses.h>
 using namespace std;
 
 int P1 = 1; 
@@ -44,6 +45,7 @@ void TicTacToe::initBoard() {
 
 int TicTacToe::move(int i) {
   nextTurn();
+
   return i; 
 } 
 
@@ -56,11 +58,33 @@ void TicTacToe::checkForWin() {
 } 
 
 void TicTacToe::play() { 
-  int imove; 
+  int imove = 0; 
   while (winner != turn) { 
-    draw(); 
-    cout << "Player " << turn << "'s turn. Please enter  move: \n"; 
-    cin >> imove; 
+    draw();
+    cout << "Player " << turn << "'s turn.\n"; 
+
+    while(imove < 10) {
+      int c;
+      switch((c = getch())) {
+        case KEY_UP:
+            cout << endl << "Up" << endl;//key up
+            imove++;
+            break;
+        case KEY_DOWN:
+            cout << endl << "Down" << endl;   // key down
+            imove++;
+            break;
+        case KEY_LEFT:
+            cout << endl << "Left" << endl;  // key left
+            imove++;
+            break;
+        case KEY_RIGHT:
+            cout << endl << "Right" << endl;  // key right
+            imove++;
+            break;
+        }
+    }
+    
     move(imove); 
   } 
   cout << "Player Number " << turn << " Wins!" << endl; 
