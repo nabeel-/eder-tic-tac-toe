@@ -25,7 +25,9 @@ public:
 protected:
   void initBoard();
   void potentialMove(int);
-  void mutateBoard(int, int);
+  void moveCharTo(int);
+  void mutateBoard(int, int, int);
+  int nextOpenPos();
 }; 
 
 void TicTacToe::startGame() { 
@@ -61,7 +63,7 @@ int TicTacToe::tryMove(int i) {
 
   if(board[row][col] == 0 || board[row][col] == 3) {
     board[row][col] = turn;
-    current_pos = 1;
+    current_pos = nextOpenPos();
   } else {
     cout << "Invalid move." << endl;
   }
@@ -101,7 +103,8 @@ void TicTacToe::draw() {
       if(j == 0) cout << "\t\t";
 
       if(board[i][j] == 3) {
-        val = "\033[1;32mP\033[0m";
+        string my_sym = (turn == 1) ? "X" : "O";
+        val = "\033[1;32m" + my_sym + "\033[0m";
       } else {
         val = board[i][j] == 0 ? " " : board[i][j] == 1 ? "X" : "O";
       }
@@ -121,34 +124,22 @@ void TicTacToe::draw() {
 //    115 : Down
 //    100 : Right
 //    97  : Left
+//    99  : Place turn
 void TicTacToe::potentialMove(int dir) {
 
-  mutateBoard(current_pos, 0);
+  mutateBoard(current_pos, 0, dir);
 
-  switch(dir) {
-    case 119:
-        // need to handle negative case separate
-        current_pos = (current_pos - 3) < 0 ? current_pos + 6 : current_pos - 3;
-        break;
-    case 115:
-        current_pos = (current_pos + 3) % 9;
-        break;
-    case 100:
-        current_pos = current_pos % 3 == 0 ? current_pos - 2 : current_pos + 1;
-        break;
-    case 97:
-        current_pos = ((current_pos - 1) % 3 == 0) ? current_pos + 2 : current_pos - 1;
-        break;
-    case 99:
-        tryMove(current_pos);
-        break;
+  if(dir == 99) {
+    tryMove(current_pos);
+  } else {
+    moveCharTo(dir);
   }
 
-  mutateBoard(current_pos, 3);
+  mutateBoard(current_pos, 3, dir);
   draw();
 }
 
-void TicTacToe::mutateBoard(int pos, int flag) {
+void TicTacToe::mutateBoard(int pos, int flag, int dir) {
   int row, col;
 
   if(current_pos <= 3) {
@@ -165,9 +156,43 @@ void TicTacToe::mutateBoard(int pos, int flag) {
   // Don't overwrite x's or o's values
   if(board[row][col] == 0 || board[row][col] == 3) {
     board[row][col] = flag;
+  } else {
+    moveCharTo(dir);
   }
 }
 
+void TicTacToe::moveCharTo(int dir) {
+  switch(dir) {
+    case 119:
+        // need to handle negative case separate
+        current_pos = (current_pos - 3) < 0 ? current_pos + 6 : current_pos - 3;
+        break;
+    case 115:
+        current_pos = (current_pos + 3) % 9;
+        break;
+    case 100:
+        current_pos = current_pos % 3 == 0 ? current_pos - 2 : current_pos + 1;
+        break;
+    case 97:
+        current_pos = ((current_pos - 1) % 3 == 0) ? current_pos + 2 : current_pos - 1;
+        break;
+  }
+}
+
+int TicTacToe::nextOpenPos() {
+  int nop;
+
+  for(int i = 0; i < 3; i++) {
+    for(int j = 0; j < 3; j++) {
+      if(board[i][j] == 0) {
+        nop = (i * 3 + j) + 1;
+        break;
+      }
+    }
+  }
+
+  return nop;
+}
 
 
 
