@@ -63,13 +63,13 @@ int TicTacToe::tryMove(int i) {
 
   if(board[row][col] == 0 || board[row][col] == 3) {
     board[row][col] = turn;
+    checkForWin();
     current_pos = nextOpenPos();
   } else {
     cout << "Invalid move." << endl;
   }
 
-  nextTurn();
-
+  if (winner != turn) { nextTurn(); };
   return i; 
 } 
 
@@ -78,7 +78,23 @@ void TicTacToe::nextTurn() {
 } 
 
 void TicTacToe::checkForWin() { 
-  
+  //Check rows
+  bool row = (board[0][0] == turn && board[0][1] == turn && board[0][2] == turn) ||
+             (board[1][0] == turn && board[1][1] == turn && board[1][2] == turn) ||
+             (board[2][0] == turn && board[2][1] == turn && board[2][2] == turn);
+
+  //Check cols
+  bool col = (board[0][0] == turn && board[1][0] == turn && board[2][0] == turn) ||
+             (board[0][1] == turn && board[1][1] == turn && board[2][1] == turn) ||
+             (board[0][2] == turn && board[1][2] == turn && board[2][2] == turn);
+
+  //Check diagonals
+  bool dia = (board[0][0] == turn && board[1][1] == turn && board[2][2] == turn) ||
+             (board[2][0] == turn && board[1][1] == turn && board[0][2] == turn);
+
+  if(row || col || dia) {
+    winner = turn;
+  }
 } 
 
 void TicTacToe::play() { 
