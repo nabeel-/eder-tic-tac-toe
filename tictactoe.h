@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 
 int P1 = 1; 
