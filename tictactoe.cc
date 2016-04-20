@@ -23,7 +23,9 @@ void showMenu() {
   cin >> option;
 
   switch (option) {
-    case 1 : game.startGame();
+    case 1 : game.startGame(1);
+             break;
+    case 2 : game.startGame(0);
              break;
     default : cout << "Bye.";
              break;
