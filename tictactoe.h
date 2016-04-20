@@ -14,9 +14,8 @@ class TicTacToe {
   int turn; 
   int winner; 
 
-  void play(int cpu); 
-
 public: 
+  void play(int cpu); 
   void startGame(int cpu);  
   
 protected:
@@ -47,9 +46,9 @@ void TicTacToe::startGame(int cpu) {
 void TicTacToe::play(int cpu) { 
   int c;
   draw();
-  while (winner != turn) { 
+  while (winner != turn && current_pos != -1) { 
 
-    if(cpu && turn == 2) {
+    if(cpu && turn == P2) {
       computerMove();
     } else {
       cout << "Player " << turn << "'s turn.\n"; 
@@ -57,8 +56,13 @@ void TicTacToe::play(int cpu) {
       potentialMove(c);
     }
     
-  } 
-  cout << "Player Number " << turn << " Wins!" << endl; 
+  }
+
+  if(current_pos == -1) {
+    cout << "\t\t\t  Tie Game!\n";
+  } else {
+    cout << "\t\t\tPlayer " << turn << " Wins!\n";
+  }
 } 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +70,7 @@ void TicTacToe::play(int cpu) {
 
 void TicTacToe::draw() { 
   system("clear");
-  cout << "\033[1;32m\t\t  EDER Zedboard Tic-Tac-Toe  \t\t\n\033[0m" << endl;
+  cout << "\033[1;32m\t\t  EDER Zedboard Tic-Tac-Toe  \t\t\n\033[0m\n";
 
   int tmp_board[3][3];
 
@@ -86,7 +90,7 @@ void TicTacToe::draw() {
   }
 
   for(int i = 0; i < 3; i++) {
-    cout << "\t\t         |         |         " << endl;
+    cout << "\t\t         |         |         \n";
     for(int j = 0; j < 3; j++) {
       string val;
       if(j == 0) cout << "\t\t";
@@ -102,9 +106,9 @@ void TicTacToe::draw() {
       
     }
     cout << "\n\t\t         |         |         \n";
-    if(i != 2) cout << "\t\t-----------------------------" << endl;
+    if(i != 2) cout << "\t\t-----------------------------\n";
   }
-  cout << endl;
+  cout << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,8 +120,8 @@ void TicTacToe::computerMove() {
   int i;
   for(i = 0; i < 9; ++i) {
     if(board[i] == 0) {
-      board[i] = 2;
-      int tempScore = -minimax(board, 1);
+      board[i] = P2;
+      int tempScore = -minimax(board, P1);
       board[i] = 0;
       if(tempScore > score) {
         score = tempScore;
@@ -149,7 +153,7 @@ int TicTacToe::tryMove(int i) {
   if(board[i] == 0 || board[i] == 3) {
     board[i] = turn;
   } else {
-    cout << "Invalid move." << endl;
+    cout << "Invalid move.\n";
   }
 
   winner = checkForWin(board);
@@ -206,8 +210,8 @@ void TicTacToe::mutateBoard(int pos, int flag, int dir) {
 
 int TicTacToe::checkForWin(int board[9]) { 
   unsigned wins[8][3] = { {0,1,2},{3,4,5},{6,7,8},
-  {0,3,6},{1,4,7},{2,5,8},
-  {0,4,8},{2,4,6}};
+                          {0,3,6},{1,4,7},{2,5,8},
+                          {0,4,8},{2,4,6}};
   int i;
   for(i = 0; i < 8; ++i) {
     if(board[wins[i][0]] != 0 &&
