@@ -2,6 +2,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <zedboard.h>
 using namespace std;
 
 int P1 = 1; 
@@ -13,6 +14,7 @@ class TicTacToe {
   int board[9];
   int turn; 
   int winner; 
+  Zedboard *zb;
 
 public: 
   void play(int cpu); 
@@ -36,15 +38,22 @@ protected:
 void TicTacToe::startGame(int cpu) { 
   turn   = P1;  
   winner = 0;
+  zb = new Zedboard();
+
+  if (zb == MAP_FAILED) {
+    perror("Mapping I/O memory failed - Did you run with 'sudo'?\n");
+    return -1;
+  }
 
   for(int i = 0; i < 9; i++) {
     board[i] = 0;
   } 
+
   play(cpu);  
 }
 
 void TicTacToe::play(int cpu) { 
-  int c;
+  int prev = 0;
   draw();
   while (winner != turn && current_pos != -1) { 
 
@@ -52,8 +61,12 @@ void TicTacToe::play(int cpu) {
       computerMove();
     } else {
       cout << "Player " << turn << "'s turn.\n"; 
-      c = getchar();
-      potentialMove(c);
+      int pushed = zb.PushButtonGet();
+
+      if(prev != pushed) {
+        potentialMove(pushed);
+        prev = pushed;
+      } 
     }
     
   }
@@ -138,7 +151,7 @@ void TicTacToe::potentialMove(int dir) {
 
   mutateBoard(current_pos, 0, dir);
 
-  if(dir == 99) {
+  if(dir == 5) {
     tryMove(current_pos);
   } else {
     moveCharTo(dir);
@@ -160,7 +173,7 @@ int TicTacToe::tryMove(int i) {
   
   if (winner != turn) { 
     turn = turn == P1 ? P2 : P1;     
-    mutateBoard(current_pos, 0, 119);
+    mutateBoard(current_pos, 0, 0);
     current_pos = nextOpenPos();
   };
   return i; 
@@ -171,17 +184,17 @@ int TicTacToe::tryMove(int i) {
 
 void TicTacToe::moveCharTo(int dir) {
   switch(dir) {
-    case 119: // Up
+    case 0: // Up
       // need to handle negative case separate
     current_pos = (current_pos - 3) < 0 ? current_pos + 6 : current_pos - 3;
     break;
-    case 115: // Down
+    case 1: // Down
     current_pos = (current_pos + 3) > 8 ? current_pos - 6 : current_pos + 3;
     break;
-    case 100: // Left
+    case 4: // Left
     current_pos = (current_pos + 1) % 3 == 0 ? current_pos - 2 : current_pos + 1;
     break;
-    case 97: // Right
+    case 3: // Right
     current_pos = (current_pos % 3 == 0) ? current_pos + 2 : current_pos - 1;
     break;
   }
